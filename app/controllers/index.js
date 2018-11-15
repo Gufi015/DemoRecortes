@@ -157,8 +157,8 @@ function openPhotoGallery() {
 
 			intent.putExtra("outputX", 0);
 			intent.putExtra("outputY", 0);
-			//intent.putExtra("aspectX", 1);
-			//intent.putExtra("aspectY", 1);
+			intent.putExtra("aspectX", 0);
+			intent.putExtra("aspectY", 0);
 			intent.putExtra("scale", true);
 			intent.putExtra("return-data", true);
 
