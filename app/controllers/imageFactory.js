@@ -1,89 +1,146 @@
 // Arguments passed into this controller can be accessed via the `$.args` object directly or:
 var args = $.args;
+//
+// var scanner = Titanium.UI.createView({
+// width : 260,
+// height : 200,
+// borderColor : 'red',
+// borderWidth : 5,
+// borderRadius : 15
+// });
+//
+// var button = Titanium.UI.createButton({
+// color : '#fff',
+// bottom : 10,
+// width : 301,
+// height : 57,
+// font : {
+// fontSize : 20,
+// fontWeight : 'bold',
+// fontFamily : 'Helvetica Neue'
+// },
+// title : 'Take Picture'
+// });
+// $.win.add(button);
+//
+// var overlay = Titanium.UI.createView();
+// overlay.add(scanner);
+// overlay.add(button);
+//
+// button.addEventListener('click', function() {
+// scanner.borderColor = 'blue';
+// Ti.Media.takePicture();
+// abrirCamara();
+// });
+//
+// var imageView = Ti.UI.createImageView({
+// width : 320,
+// height : 280,
+// borderColor: 'yellow',
+// borderRadius: 3,
+// });
+// $.win.add(imageView);
+//
+// function abrirCamara() {
+// Titanium.Media.showCamera({
+// saveToPhotoGallery : true,
+// success : function(event) {
+// imageView.image = event.media;
+// },
+// cancel : function() {
+// },
+// error : function(error) {
+// var a = Titanium.UI.createAlertDialog({
+// title : 'Camera'
+// });
+// if (error.code == Titanium.Media.NO_CAMERA) {
+// a.setMessage('Please run this test on device');
+// } else {
+// a.setMessage('Unexpected error: ' + error.code);
+// }
+// a.show();
+// },
+// overlay : overlay,
+// showControls : true, // don't show system controls
+// });
+// }
 
-var imageView = Titanium.UI.createImageView({
-    image: '/images/bravo.jpg',
-    top: 4,
-    left: 4,
-    width: Ti.UI.SIZE || 'auto',
-    height: Ti.UI.SIZE || 'auto'
+var open_camera = Ti.UI.createButton({
+	height : Ti.UI.SIZE,
+	width : Ti.UI.SIZE,
+	bottom : 50,
+	title : 'Camera'
 });
+// Adding the "open camera" button
+$.win.add(open_camera);
 
-$.window.add(imageView);
-
-var btnTransform = Titanium.UI.createButton({
-    title: 'Next', zIndex: 1,
-    bottom: 4, left: 4,
-    width: '40%', height: 60
+var imageView = Ti.UI.createImageView({
+	width : 320,
+	height : 280,
+	borderColor : 'yellow',
+	borderRadius : 3,
 });
-$.window.add(btnTransform);
+$.win.add(imageView);
 
-var btnSave = Titanium.UI.createButton({
-    title: 'Save', zIndex: 1,
-    right: 4, bottom: 4,
-    width: '40%', height: 60
-});
-$.window.add(btnSave);
+// Function to show the camera
+function openCamera() {
+	//alert('opening');
+	open_camera.backgroundColor = "blue";
+	// Just checking if we got here
+	// The camera overlay I want displayed over the camera
+	var camera_overlay = Ti.UI.createView({
+		//top : 0,
+		//left : 0,
+		height : '150dp',
+		width : '100dp',
+		borderColor : 'red',
+		borderRadius : 3,
+		borderWidth : 3,
+	});
+	var overlay = Ti.UI.createView({
+		//top : 0,
+		//left : 0,
+		height : '280dp',
+		width : '350dp',
+		borderColor : 'red',
+		borderRadius : 3,
+		borderWidth : 3,
+	});
+	camera_overlay.add(overlay);
 
-var imageViewTransformed = Titanium.UI.createImageView({
-    top: 221,
-    left: 4,
-    width: Ti.UI.SIZE || 'auto',
-    height: Ti.UI.SIZE || 'auto'
-});
+	var take_picture = Ti.UI.createButton({
+		height : Ti.UI.SIZE,
+		width : Ti.UI.SIZE,
+		bottom : 50,
+		title : 'Tomar Foto'
+	});
+	take_picture.addEventListener('click', function() {
+		Ti.Media.takePicture();
+	});
+	camera_overlay.add(take_picture);
+	// The actual show camera part
+	Ti.Media.showCamera({
+		success : function(e) {
+			//alert('success');
+			// I want this!
+			imageView.image = e.media;
+			imageView.width = Ti.UI.FILL;
+			imageView.height = Ti.UI.FILL;
+		},
 
-$.window.add(imageViewTransformed);
-//$.window.open();
+		cancel : function(e) {
+		},
+		error : function(error) {
+			alert('ERROR IN' + error.code);
+		},
+		// autohide: false,
+		// showControls: false,
+		//mediaTypes: [Ti.Media.MEDIA_TYPE_PHOTO],
+		overlay : camera_overlay // The camera overlay being added to camera view
+	});
+};
 
-var ImageFactory = require('ti.imagefactory');
-
-var f = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'images', 'bravo.jpg');
-var blob = f.read();
-imageViewTransformed.image = blob;
-var type = 0;
-
-btnTransform.addEventListener('click', function (e) {
-    switch (type) {
-        case 0:
-            newBlob = ImageFactory.imageWithAlpha(blob, { format: ImageFactory.PNG });
-            break;
-        case 1:
-            newBlob = ImageFactory.imageWithTransparentBorder(blob, { borderSize: 10, format: ImageFactory.PNG });
-            break;
-        case 2:
-            newBlob = ImageFactory.imageWithRoundedCorner(blob, { borderSize: 4, cornerRadius: 8, format: ImageFactory.PNG });
-            break;
-        case 3:
-            newBlob = ImageFactory.imageAsThumbnail(blob, {size: 64, borderSize: 5, cornerRadius: 10, format: ImageFactory.PNG });
-            break;
-        case 4:
-            newBlob = ImageFactory.imageAsResized(blob, { width: 140, height: 140 });
-            break;
-        case 5:
-            newBlob = ImageFactory.imageAsCropped(blob, { width: 100, height: 100, x: 50, y: 50 });
-            break;
-        case 6:
-            newBlob = ImageFactory.imageTransform(blob,
-                { type: ImageFactory.TRANSFORM_CROP, width: 200, height: 200 },
-                { type: ImageFactory.TRANSFORM_ROUNDEDCORNER, borderSize: 6, cornerRadius: 20, format: ImageFactory.PNG }
-            );
-            break;
-    }
-    imageViewTransformed.image = newBlob;
-    imageViewTransformed.size = { width: newBlob.width, height: newBlob.height };
-
-    type = (type + 1) % 7;
-});
-
-btnSave.addEventListener('click', function (e) {
-    newBlob = ImageFactory.compress(blob, 0.25);
-    var filename = Titanium.Filesystem.applicationDataDirectory + "/newbravo.jpg";
-    f = Titanium.Filesystem.getFile(filename);
-    f.write(newBlob);
-
-    var alert = Ti.UI.createAlertDialog({
-        title: 'Image Factory',
-        message: 'Compressed image saved to newflower.jpg with compression quality of 25%'
-    });
-    alert.show();
+// Click event to show the camera
+open_camera.addEventListener("click", function(e) {
+	openCamera();
 });

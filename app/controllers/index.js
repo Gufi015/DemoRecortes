@@ -131,6 +131,19 @@ function openPhotoGallery() {
 	});
 
 };
-
 $.index.add(myView);
+
+
+var btnImage = Ti.UI.createButton({
+	title: 'ImageFactory',
+	bottom: 10,
+	right:10
+});
+$.index.add(btnImage);
+
+btnImage.addEventListener('click', function(){
+	var imageFactory = Alloy.createController('imageFactory').getView();
+	imageFactory.open();
+});
+
 $.index.open();
