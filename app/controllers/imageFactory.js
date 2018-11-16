@@ -22,6 +22,9 @@ var args = $.args;
 // title : 'Take Picture'
 // });
 // $.win.add(button);
+
+
+
 //
 // var overlay = Titanium.UI.createView();
 // overlay.add(scanner);
